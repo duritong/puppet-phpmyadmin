@@ -10,25 +10,32 @@ class phpmyadmin {
         gentoo: { include webapp-config }
     }
     
-    package { 'phpmyadmin':
+    $modulename = "phpmyadmin"
+    $pkgname = "phpmyadmin"
+    $gentoocat = "dev-db"
+    $cnfname = "config.inc.php"
+    $cnfpath = "/var/www/localhost/htdocs/phpmyadmin"
+
+    package { $pkgname:
         ensure => present,
         category => $operatingsystem ? {
-            gentoo => 'dev-db',
+            gentoo => $gentoocat,
             default => '',
         }
     }
 
-    # config files
     file{
-        "/var/www/localhost/htdocs/phpmyadmin/config.inc.php":
+        "${cnfpath}/${cnfname}":
             source => [
-                "puppet://$server/dist/phpmyadmin/${fqdn}/config.inc.php",
-                "puppet://$server/phpmyadmin/${fqdn}/config.inc.php",
-                "puppet://$server/phpmyadmin/config.inc.php"
+                "puppet://$server/dist/${modulename}/${fqdn}/${cnfname}",
+                "puppet://$server/${modulename}/${fqdn}/${cnfname}",
+                "puppet://$server/${modulename}/${cnfname}"
             ],
             owner => root,
             group => 0,
             mode => 0444,
-            require => Package[phpmyadmin],
+            require => Package[$pkgname],
     }
+
 }
+
