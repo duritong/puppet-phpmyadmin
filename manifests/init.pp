@@ -19,16 +19,16 @@ class phpmyadmin {
     }
 
     # config files
-#    file{
-#        "/var/www/localhost/htdocs/phpmyadmin/":
-#            source => [
-#                "puppet://$server/dist/php/apache2_php5_php.ini/${fqdn}/php.ini",
-#                "puppet://$server/php/apache2_php5_php.ini/${fqdn}/php.ini",
-#                "puppet://$server/php/apache2_php5_php.ini/php.ini"
-#            ],
-#            owner => root,
-#            group => 0,
-#            mode => 0644,
-#            require => Package[phpmyadmin],
-#    }
+    file{
+        "/var/www/localhost/htdocs/phpmyadmin/config.inc.php":
+            source => [
+                "puppet://$server/dist/phpmyadmin/${fqdn}/config.inc.php",
+                "puppet://$server/phpmyadmin/${fqdn}/config.inc.php",
+                "puppet://$server/phpmyadmin/config.inc.php"
+            ],
+            owner => root,
+            group => 0,
+            mode => 0444,
+            require => Package[phpmyadmin],
+    }
 }
