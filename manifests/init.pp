@@ -31,6 +31,7 @@ class phpmyadmin {
                 "puppet://$server/${modulename}/${fqdn}/${cnfname}",
                 "puppet://$server/${modulename}/${cnfname}"
             ],
+            ensure => file,
             owner => root,
             group => 0,
             mode => 0444,
