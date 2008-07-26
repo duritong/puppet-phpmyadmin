@@ -7,6 +7,7 @@
 class phpmyadmin {
     case $operatingsystem {
         gentoo: { include phpmyadmin::gentoo }
+        centos: { include phpmyadmin::centos }
         default: { include phpmyadmin::base }
     }
 }
@@ -15,6 +16,7 @@ class phpmyadmin::base {
 
     package { phpmyadmin:
         ensure => present,
+        require => Package[php],
     }
 
     file{ phpmyadmin_config:
@@ -42,3 +44,12 @@ class phpmyadmin::gentoo inherits phpmyadmin::base {
     }
 }
 
+class phpmyadmin::centos inherits phpmyadmin::base {
+    Package[phpmyadmin]{
+        require +> Package[php-mysql],
+    }
+
+    File[phpmyadmin_config]{
+        path => "/etc/phpMyAdmin/config.inc.php",
+    }
+}
