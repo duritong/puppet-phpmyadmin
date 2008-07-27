@@ -13,7 +13,6 @@ class phpmyadmin {
 }
 
 class phpmyadmin::base {
-    include php
 
     package { phpmyadmin:
         ensure => present,
