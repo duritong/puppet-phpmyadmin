@@ -52,6 +52,6 @@ class phpmyadmin::centos inherits phpmyadmin::base {
     }
 
     File[phpmyadmin_config]{
-        path => "/etc/phpMyAdmin/config.inc.php",
+        path => '/usr/share/phpmyadmin/config.inc.php',
     }
 }
