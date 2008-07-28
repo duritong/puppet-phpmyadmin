@@ -18,7 +18,7 @@ class phpmyadmin::base {
 
     package { phpmyadmin:
         ensure => present,
-        require => Package[php-mysql],
+        require => Package[php],
     }
 
     file{ phpmyadmin_config:
