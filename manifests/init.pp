@@ -14,10 +14,11 @@ class phpmyadmin {
 
 class phpmyadmin::base {
     include php
+    include php::mysql
 
     package { phpmyadmin:
         ensure => present,
-        require => Package[php],
+        require => Package[php-mysql],
     }
 
     file{ phpmyadmin_config:
