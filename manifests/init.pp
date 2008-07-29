@@ -48,7 +48,7 @@ class phpmyadmin::gentoo inherits phpmyadmin::base {
 
 class phpmyadmin::centos inherits phpmyadmin::base {
     Package[phpmyadmin]{
-        name => 'phpMyAdmin'
+        name => 'phpMyAdmin',
         require +> Package[php-mysql],
     }
 
