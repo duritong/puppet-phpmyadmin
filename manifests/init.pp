@@ -14,7 +14,7 @@ class phpmyadmin {
 
 class phpmyadmin::base {
     include php
-    include php::mysql
+    include php::extensions::mysql
 
     package { phpmyadmin:
         ensure => present,
