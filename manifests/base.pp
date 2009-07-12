@@ -1,6 +1,7 @@
 class phpmyadmin::base {
     include php
     include php::extensions::mysql
+    include php::extensions::mcrypt
 
     package { phpmyadmin:
         ensure => present,
