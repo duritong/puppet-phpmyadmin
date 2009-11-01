@@ -13,7 +13,7 @@ class phpmyadmin::base {
             source => [
                 "puppet://$server/files/phpmyadmin/${fqdn}/config.inc.php",
                 "puppet://$server/files/phpmyadmin/config.inc.php",
-                "puppet://$server/phpmyadmin/config.inc.php"
+                "puppet://$server/modules/phpmyadmin/config.inc.php"
             ],
             ensure => file,
             owner => root,
