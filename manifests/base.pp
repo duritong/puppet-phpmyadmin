@@ -11,8 +11,8 @@ class phpmyadmin::base {
     file{ phpmyadmin_config:
             path => "/var/www/localhost/htdocs/phpmyadmin/config.inc.php",
             source => [
-                "puppet://$server/files/phpmyadmin/${fqdn}/config.inc.php",
-                "puppet://$server/files/phpmyadmin/config.inc.php",
+                "puppet://$server/modules/site-phpmyadmin/${fqdn}/config.inc.php",
+                "puppet://$server/modules/site-phpmyadmin/config.inc.php",
                 "puppet://$server/modules/phpmyadmin/config.inc.php"
             ],
             ensure => file,
