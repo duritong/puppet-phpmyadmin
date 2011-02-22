@@ -9,8 +9,14 @@ define phpmyadmin::vhost(
     ensure => $ensure,
     serveralias => $serveralias,
     manage_docroot => false,
-    path => '/usr/share/phpMyAdmin',
-    logpath => '/var/logs/httpd',
+    path => $operatingsystem ? {
+      gentoo => '/var/www/localhost/htdocs/phpmyadmin',
+      default => '/usr/share/phpMyAdmin'
+    },
+    logpath => $operatingsystem ? {
+      gentoo => '/var/log/apache2/',
+      default => '/var/logs/httpd'
+    },
     manage_webdir => false,
     path_is_webdir => true,
     ssl_mode => $ssl_mode,
