@@ -1,13 +1,13 @@
 define phpmyadmin::vhost(
   $ensure = 'present',
-  $serveralias = 'absent',
+  $domainalias = 'absent',
   $ssl_mode = 'force',
   $monitor_url = 'absent'
 ){
   include ::phpmyadmin::vhost::absent_webconfig
   apache::vhost::php::standard{$name:
     ensure => $ensure,
-    serveralias => $serveralias,
+    domainalias => $domanalias,
     manage_docroot => false,
     path => $operatingsystem ? {
       gentoo => '/var/www/localhost/htdocs/phpmyadmin',
