@@ -7,7 +7,7 @@ define phpmyadmin::vhost(
   include ::phpmyadmin::vhost::absent_webconfig
   apache::vhost::php::standard{$name:
     ensure => $ensure,
-    domainalias => $domanalias,
+    domainalias => $domainalias,
     manage_docroot => false,
     path => $operatingsystem ? {
       gentoo => '/var/www/localhost/htdocs/phpmyadmin',
