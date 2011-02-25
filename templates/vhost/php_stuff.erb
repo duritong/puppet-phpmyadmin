@@ -1,8 +1,8 @@
   <Directory "<%= documentroot %>/">
-        Allow from all
-        php_admin_flag engine on
-        php_admin_flag safe_mode On
-        php_admin_value open_basedir <%= documentroot %>/:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/<%= name %>/:/var/www/session.save_path/<%= name %>
-        php_admin_value upload_tmp_dir /var/www/upload_tmp_dir/<%= name %>/
-        php_admin_value session.save_path /var/www/session.save_path/<%= name %>/
+    Allow from all
+    php_admin_flag engine on
+    php_admin_flag safe_mode On
+    php_admin_value open_basedir <%= documentroot %>/:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/<%= name %>/:/var/www/session.save_path/<%= name %>
+    php_admin_value upload_tmp_dir /var/www/upload_tmp_dir/<%= name %>/
+    php_admin_value session.save_path /var/www/session.save_path/<%= name %>/
   </Directory>
