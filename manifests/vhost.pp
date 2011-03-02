@@ -2,7 +2,8 @@ define phpmyadmin::vhost(
   $ensure = 'present',
   $domainalias = 'absent',
   $ssl_mode = 'force',
-  $monitor_url = 'absent'
+  $monitor_url = 'absent',
+  $auth_method = 'http'
 ){
   include ::phpmyadmin::vhost::absent_webconfig
   apache::vhost::php::standard{$name:
@@ -31,6 +32,10 @@ define phpmyadmin::vhost(
     }
     nagios::service::http{"${real_monitor_url}":
       ensure => $ensure,
+      check_code => $auth_method ? {
+        'http' => '401',
+        default => 'OK'
+      },
       ssl_mode => $ssl_mode,
     }
   }
