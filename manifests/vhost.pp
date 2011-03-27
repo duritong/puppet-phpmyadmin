@@ -3,7 +3,8 @@ define phpmyadmin::vhost(
   $domainalias = 'absent',
   $ssl_mode = 'force',
   $monitor_url = 'absent',
-  $auth_method = 'http'
+  $auth_method = 'http',
+  $logmode = 'default'
 ){
   include ::phpmyadmin::vhost::absent_webconfig
   apache::vhost::php::standard{$name:
@@ -18,6 +19,7 @@ define phpmyadmin::vhost(
       gentoo => '/var/log/apache2/',
       default => '/var/log/httpd'
     },
+    logmode => $logmode,
     manage_webdir => false,
     path_is_webdir => true,
     ssl_mode => $ssl_mode,
