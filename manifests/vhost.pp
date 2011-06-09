@@ -25,6 +25,7 @@ define phpmyadmin::vhost(
     ssl_mode => $ssl_mode,
     template_partial => 'phpmyadmin/vhost/php_stuff.erb',
     require => Package['phpMyAdmin'],
+    mod_security => false,
   }
 
   if $use_nagios {
