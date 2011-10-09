@@ -3,17 +3,37 @@ define phpmyadmin::vhost(
   $domainalias = 'absent',
   $ssl_mode = 'force',
   $run_mode = 'normal',
-  $run_uid = 'apache',
-  $run_gid = 'apache',
+  $run_uid = 'absent',
+  $run_gid = 'absent',
   $monitor_url = 'absent',
   $auth_method = 'http',
   $logmode = 'default'
 ){
-  include ::phpmyadmin::vhost::absent_webconfig
   $documentroot = $operatingsystem ? {
     gentoo => '/var/www/localhost/htdocs/phpmyadmin',
     default => '/usr/share/phpMyAdmin'
   }
+
+  if ($run_mode == 'fcgid'){
+    if (($run_uid == 'absent') or ($run_gid == 'absent')) { fail("Need to configure \$run_uid and \$run_gid if you want to run Phpmyadmin::Vhost[${name}] as fcgid.") }
+
+    user::managed{$name:
+      ensure => $ensure,
+      uid => $run_uid,
+      gid => $run_gid,
+      managehome => false,
+      homedir => $documentroot,
+      shell => $operatingsystem ? {
+        debian => '/usr/sbin/nologin',
+        ubuntu => '/usr/sbin/nologin',
+        default => '/sbin/nologin'
+      },
+      before => ApacheVhost::Php::Standard[$name],
+    }
+  }
+
+  include ::phpmyadmin::vhost::absent_webconfig
+
   apache::vhost::php::standard{$name:
     ensure => $ensure,
     domainalias => $domainalias,
@@ -35,7 +55,7 @@ define phpmyadmin::vhost(
     manage_webdir => false,
     path_is_webdir => true,
     ssl_mode => $ssl_mode,
-    template_partial => 'phpmyadmin/vhost/php_stuff.erb',
+    template_partial => 'apache/vhosts/php/partial.erb',
     require => Package['phpMyAdmin'],
     mod_security => false,
   }
