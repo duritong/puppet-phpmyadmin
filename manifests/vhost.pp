@@ -7,17 +7,23 @@ define phpmyadmin::vhost(
   $logmode = 'default'
 ){
   include ::phpmyadmin::vhost::absent_webconfig
+  $documentroot = $operatingsystem ? {
+    gentoo => '/var/www/localhost/htdocs/phpmyadmin',
+    default => '/usr/share/phpMyAdmin'
+  }
   apache::vhost::php::standard{$name:
     ensure => $ensure,
     domainalias => $domainalias,
     manage_docroot => false,
-    path => $operatingsystem ? {
-      gentoo => '/var/www/localhost/htdocs/phpmyadmin',
-      default => '/usr/share/phpMyAdmin'
-    },
+    path => $documentroot,
     logpath => $operatingsystem ? {
       gentoo => '/var/log/apache2/',
       default => '/var/log/httpd'
+    },
+    php_settings => {
+      'session.save_path' =>  "/var/www/session.save_path/${name}/",
+      'upload_tmp_dir'    =>  "/var/www/upload_tmp_dir/${name}/",
+      'open_basedir'      =>  "${documentroot}/:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/",
     },
     logmode => $logmode,
     manage_webdir => false,
