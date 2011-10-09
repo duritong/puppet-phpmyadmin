@@ -28,7 +28,7 @@ define phpmyadmin::vhost(
         ubuntu => '/usr/sbin/nologin',
         default => '/sbin/nologin'
       },
-      before => ApacheVhost::Php::Standard[$name],
+      before => Apache::Vhost::Php::Standard[$name],
     }
   }
 
