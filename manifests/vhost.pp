@@ -59,6 +59,13 @@ define phpmyadmin::vhost(
     require => Package['phpMyAdmin'],
     mod_security => false,
   }
+  
+  if $run_mode == 'fcgid' {
+    Apache::Vhost::Php::Standard[$name]{
+      additional_options => "RewriteEngine On
+RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",  
+    }
+  }
 
   if $use_nagios {
     $real_monitor_url = $monitor_url ? {
