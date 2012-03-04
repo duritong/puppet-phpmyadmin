@@ -6,7 +6,7 @@ define phpmyadmin::vhost(
   $run_uid = 'absent',
   $run_gid = 'absent',
   $monitor_url = 'absent',
-  $auth_method = 'http',
+  $auth_method = hiera('phpmyadmin_auth_method','http'),
   $logmode = 'default'
 ){
   $documentroot = $operatingsystem ? {
@@ -59,11 +59,11 @@ define phpmyadmin::vhost(
     require => Package['phpMyAdmin'],
     mod_security => false,
   }
-  
+
   if $run_mode == 'fcgid' {
     Apache::Vhost::Php::Standard[$name]{
       additional_options => "RewriteEngine On
-RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",  
+RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",
     }
   }
 
