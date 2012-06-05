@@ -9,7 +9,7 @@ define phpmyadmin::vhost(
   $auth_method = hiera('phpmyadmin_auth_method','http'),
   $logmode = 'default'
 ){
-  $documentroot = $operatingsystem ? {
+  $documentroot = $::operatingsystem ? {
     gentoo => '/var/www/localhost/htdocs/phpmyadmin',
     default => '/usr/share/phpMyAdmin'
   }
@@ -67,12 +67,12 @@ RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",
     }
   }
 
-  if $use_nagios {
+  if hiera('use_nagios',false) {
     $real_monitor_url = $monitor_url ? {
       'absent' => $name,
       default => $monitor_url,
     }
-    nagios::service::http{"${real_monitor_url}":
+    nagios::service::http{$real_monitor_url:
       ensure => $ensure,
       check_code => $auth_method ? {
         'http' => '401',

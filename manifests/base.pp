@@ -1,26 +1,25 @@
 class phpmyadmin::base {
-    include php
-    include php::extensions::mysql
-    include php::extensions::mcrypt
+  include php
+  include php::extensions::mysql
+  include php::extensions::mcrypt
 
-    package { phpmyadmin:
-        ensure => present,
-        require => Package[php],
-    }
+  package { phpmyadmin:
+    ensure => present,
+    require => Package[php],
+  }
 
-    file{ phpmyadmin_config:
-            path => "/var/www/localhost/htdocs/phpmyadmin/config.inc.php",
-            source => [
-                "puppet:///modules/site-phpmyadmin/${fqdn}/config.inc.php",
-                "puppet:///modules/site-phpmyadmin/config.inc.php",
-                "puppet:///modules/phpmyadmin/config.inc.php"
-            ],
-            ensure => file,
-            owner => root,
-            group => 0,
-            mode => 0444,
-            require => Package[phpmyadmin],
-    }
-
+  file{ phpmyadmin_config:
+    path => "/var/www/localhost/htdocs/phpmyadmin/config.inc.php",
+    source => [
+      "puppet:///modules/site_phpmyadmin/${::fqdn}/config.inc.php",
+      "puppet:///modules/site_phpmyadmin/config.inc.php",
+      "puppet:///modules/phpmyadmin/config.inc.php"
+    ],
+    ensure => file,
+    owner => root,
+    group => 0,
+    mode => 0444,
+    require => Package[phpmyadmin],
+  }
 }
 

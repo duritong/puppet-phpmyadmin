@@ -3,7 +3,7 @@
 #
 
 class phpmyadmin {
-    case $operatingsystem {
+    case $::operatingsystem {
         gentoo: { include phpmyadmin::gentoo }
         centos: { include phpmyadmin::centos }
         default: { include phpmyadmin::base }
