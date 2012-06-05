@@ -23,7 +23,7 @@ define phpmyadmin::vhost(
       gid => $run_gid,
       managehome => false,
       homedir => $documentroot,
-      shell => $operatingsystem ? {
+      shell => $::operatingsystem ? {
         debian => '/usr/sbin/nologin',
         ubuntu => '/usr/sbin/nologin',
         default => '/sbin/nologin'
@@ -39,7 +39,7 @@ define phpmyadmin::vhost(
     domainalias => $domainalias,
     manage_docroot => false,
     path => $documentroot,
-    logpath => $operatingsystem ? {
+    logpath => $::operatingsystem ? {
       gentoo => '/var/log/apache2/',
       default => '/var/log/httpd'
     },
