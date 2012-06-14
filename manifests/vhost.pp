@@ -6,8 +6,9 @@ define phpmyadmin::vhost(
   $run_uid = 'absent',
   $run_gid = 'absent',
   $monitor_url = 'absent',
-  $auth_method = hiera('phpmyadmin_auth_method','http'),
-  $logmode = 'default'
+  $auth_method = 'http',
+  $logmode = 'default',
+  $manage_nagios = false
 ){
   $documentroot = $::operatingsystem ? {
     gentoo => '/var/www/localhost/htdocs/phpmyadmin',
@@ -67,7 +68,7 @@ RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",
     }
   }
 
-  if hiera('use_nagios',false) {
+  if $manage_nagios {
     $real_monitor_url = $monitor_url ? {
       'absent' => $name,
       default => $monitor_url,
