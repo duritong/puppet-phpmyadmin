@@ -50,7 +50,7 @@ define phpmyadmin::vhost(
     php_settings      => {
       'session.save_path' =>  "/var/www/session.save_path/${name}/",
       'upload_tmp_dir'    =>  "/var/www/upload_tmp_dir/${name}/",
-      'open_basedir'      =>  "${documentroot}/:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/",
+      'open_basedir'      =>  "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/",
     },
     logmode           => $logmode,
     run_mode          => $run_mode,
