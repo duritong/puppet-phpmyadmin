@@ -7,7 +7,7 @@ define phpmyadmin::vhost(
   $run_uid        = 'absent',
   $run_gid        = 'absent',
   $monitor_url    = 'absent',
-  $auth_method    = 'http',
+  $auth_method    = 'cookie',
   $logmode        = 'default',
   $manage_nagios  = false
 ){
@@ -76,9 +76,11 @@ RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",
       'absent'  => $name,
       default   => $monitor_url,
     }
-    $check_code = $auth_method ? {
-      'http' => '401',
-      default => 'OK'
+    # old version that might do http-auth
+    if ($auth_method == 'http') and ($::operatingsystem == 'CentOS') and ($::operatingsystemrelease < 6) {
+      $check_code = '401'
+    } else {
+      $check_code = 'OK'
     }
     nagios::service::http{$real_monitor_url:
       ensure      => $ensure,
