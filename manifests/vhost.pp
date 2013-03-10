@@ -47,6 +47,7 @@ define phpmyadmin::vhost(
     manage_docroot    => false,
     path              => $documentroot,
     logpath           => $logpath,
+    logprefix         => "${name}-",
     php_settings      => {
       'session.save_path' =>  "/var/www/session.save_path/${name}/",
       'upload_tmp_dir'    =>  "/var/www/upload_tmp_dir/${name}/",
