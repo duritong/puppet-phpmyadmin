@@ -9,7 +9,7 @@ define phpmyadmin::vhost(
   $monitor_url    = 'absent',
   $auth_method    = 'cookie',
   $logmode        = 'default',
-  $manage_nagios  = false
+  $manage_nagios  = false,
 ){
   $documentroot = $::operatingsystem ? {
     gentoo  => '/var/www/localhost/htdocs/phpmyadmin',
@@ -17,7 +17,9 @@ define phpmyadmin::vhost(
   }
 
   if ($run_mode == 'fcgid'){
-    if (($run_uid == 'absent') or ($run_gid == 'absent')) { fail("Need to configure \$run_uid and \$run_gid if you want to run Phpmyadmin::Vhost[${name}] as fcgid.") }
+    if (($run_uid == 'absent') or ($run_gid == 'absent')) {
+      fail("Need to configure \$run_uid and \$run_gid if you want to run Phpmyadmin::Vhost[${name}] as fcgid.")
+    }
 
     $shell = $::operatingsystem ? {
       debian  => '/usr/sbin/nologin',
@@ -49,9 +51,9 @@ define phpmyadmin::vhost(
     logpath           => $logpath,
     logprefix         => "${name}-",
     php_settings      => {
-      'session.save_path' =>  "/var/www/session.save_path/${name}/",
-      'upload_tmp_dir'    =>  "/var/www/upload_tmp_dir/${name}/",
-      'open_basedir'      =>  "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/",
+      'session.save_path' => "/var/www/session.save_path/${name}/",
+      'upload_tmp_dir'    => "/var/www/upload_tmp_dir/${name}/",
+      'open_basedir'      => "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/",
     },
     logmode           => $logmode,
     run_mode          => $run_mode,
