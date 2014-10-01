@@ -37,6 +37,15 @@ define phpmyadmin::vhost(
     }
   }
 
+  if $::operatingsystem == 'CentOS' and $::operatingsystemmajrelease > 5 {
+    file{'/etc/phpMyAdmin':
+      ensure => directory,
+      user   => root,
+      group  => $name,
+      mode   => '0640',
+    }
+  }
+
   include ::phpmyadmin::vhost::absent_webconfig
 
   $logpath = $::operatingsystem ? {
