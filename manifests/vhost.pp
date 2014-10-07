@@ -40,7 +40,7 @@ define phpmyadmin::vhost(
   if $::operatingsystem == 'CentOS' and $::operatingsystemmajrelease > 5 {
     file{'/etc/phpMyAdmin':
       ensure => directory,
-      user   => root,
+      owner  => root,
       group  => $name,
       mode   => '0640',
     }
