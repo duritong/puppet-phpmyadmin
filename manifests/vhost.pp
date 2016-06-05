@@ -11,76 +11,124 @@ define phpmyadmin::vhost(
   $logmode        = 'default',
   $manage_nagios  = false,
 ){
-  $documentroot = $::operatingsystem ? {
-    gentoo  => '/var/www/localhost/htdocs/phpmyadmin',
-    default => '/usr/share/phpMyAdmin'
-  }
+  $documentroot = '/usr/share/phpMyAdmin'
+
+  include ::phpmyadmin
+  include ::phpmyadmin::vhost::absent_webconfig
+
 
   if ($run_mode == 'fcgid'){
     if (($run_uid == 'absent') or ($run_gid == 'absent')) {
       fail("Need to configure \$run_uid and \$run_gid if you want to run Phpmyadmin::Vhost[${name}] as fcgid.")
     }
 
-    $shell = $::operatingsystem ? {
-      debian  => '/usr/sbin/nologin',
-      ubuntu  => '/usr/sbin/nologin',
-      default => '/sbin/nologin'
-    }
     user::managed{$name:
-      ensure      => $ensure,
-      uid         => $run_uid,
-      gid         => $run_gid,
-      managehome  => false,
-      homedir     => $documentroot,
-      shell       => $shell,
-      before      => Apache::Vhost::Php::Standard[$name],
+      ensure     => $ensure,
+      uid        => $run_uid,
+      gid        => $run_gid,
+      managehome => false,
+      homedir    => $documentroot,
+      shell      => '/sbin/nologin',
+      before     => Apache::Vhost::Php::Standard[$name],
     }
   }
 
-  if $::operatingsystem == 'CentOS' and $::operatingsystemmajrelease > 5 {
-    file{'/etc/phpMyAdmin':
-      ensure => directory,
-      owner  => root,
-      group  => $name,
-      mode   => '0640',
-    }
+  file{
+    '/etc/phpMyAdmin':
+      ensure  => directory,
+      owner   => root,
+      group   => $name,
+      mode    => '0640',
+      require => Package['phpMyAdmin'];
+    '/etc/phpMyAdmin/config.inc.php':
+      owner   => root,
+      group   => $name,
+      mode    => '0640';
   }
 
-  include ::phpmyadmin::vhost::absent_webconfig
-
-  $logpath = $::operatingsystem ? {
-    gentoo  => '/var/log/apache2/',
-    default => '/var/log/httpd'
+  if versioncmp($::operatingsystemmajrelease,'6') > 0 {
+    if $::phpmyadmin_version {
+      $guessed_phpmyadmin_version = $::phpmyadmin_version
+    } else {
+      $guessed_phpmyadmin_version = '4.4.15.5'
+    }
+    $open_basedir = "${documentroot}/:/usr/share/doc/phpMyAdmin-${guessed_phpmyadmin_version}/html/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
+  } else {
+    $open_basedir = "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
   }
   apache::vhost::php::standard{$name:
-    ensure            => $ensure,
-    domainalias       => $domainalias,
-    manage_docroot    => false,
-    path              => $documentroot,
-    logpath           => $logpath,
-    logprefix         => "${name}-",
-    php_settings      => {
+    ensure           => $ensure,
+    domainalias      => $domainalias,
+    manage_docroot   => false,
+    path             => $documentroot,
+    logpath          => '/var/log/httpd',
+    logprefix        => "${name}-",
+    php_settings     => {
       'session.save_path' => "/var/www/session.save_path/${name}/",
       'upload_tmp_dir'    => "/var/www/upload_tmp_dir/${name}/",
-      'open_basedir'      => "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/",
+      'open_basedir'      => $open_basedir,
     },
-    logmode           => $logmode,
-    run_mode          => $run_mode,
-    run_uid           => $name,
-    run_gid           => $name,
-    manage_webdir     => false,
-    path_is_webdir    => true,
-    ssl_mode          => $ssl_mode,
-    template_partial  => 'apache/vhosts/php/partial.erb',
-    require           => Package['phpMyAdmin'],
-    mod_security      => false,
-  }
+    logmode            => $logmode,
+    run_mode           => $run_mode,
+    run_uid            => $name,
+    run_gid            => $name,
+    manage_webdir      => false,
+    path_is_webdir     => true,
+    ssl_mode           => $ssl_mode,
+    mod_security       => false,
+    require            => Package['phpMyAdmin'],
+    additional_options => '<Directory /usr/share/phpMyAdmin/>
+    AddDefaultCharset UTF-8
+    <IfModule mod_authz_core.c>
+      # Apache 2.4
+      <RequireAny>
+        Require all granted
+      </RequireAny>
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+      # Apache 2.2
+      Order Deny,Allow
+      Allow from All
+    </IfModule>
+  </Directory>
+  <Directory /usr/share/phpMyAdmin/setup/>
+    <IfModule mod_authz_core.c>
+      # Apache 2.4
+      <RequireAny>
+        Require ip 127.0.0.1
+        Require ip ::1
+      </RequireAny>
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+      # Apache 2.2
+      Order Deny,Allow
+      Deny from All
+      Allow from 127.0.0.1
+      Allow from ::1
+    </IfModule>
+  </Directory>
 
-  if $run_mode == 'fcgid' {
-    Apache::Vhost::Php::Standard[$name]{
-      additional_options => "RewriteEngine On
-RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",
-    }
+  # These directories do not require access over HTTP - taken from the original
+  # phpMyAdmin upstream tarball
+  #
+  <Directory /usr/share/phpMyAdmin/libraries/>
+    Order Deny,Allow
+    Deny from All
+    Allow from None
+  </Directory>
+
+  <Directory /usr/share/phpMyAdmin/setup/lib/>
+    Order Deny,Allow
+    Deny from All
+    Allow from None
+  </Directory>
+
+  <Directory /usr/share/phpMyAdmin/setup/frames/>
+    Order Deny,Allow
+    Deny from All
+    Allow from None
+  </Directory>
+',
   }
 
   if $manage_nagios {
@@ -88,16 +136,10 @@ RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]",
       'absent'  => $name,
       default   => $monitor_url,
     }
-    # old version that might do http-auth
-    if ($auth_method == 'http') and ($::operatingsystem == 'CentOS') and ($::operatingsystemrelease < 6) {
-      $check_code = '401'
-    } else {
-      $check_code = 'OK'
-    }
     nagios::service::http{$real_monitor_url:
-      ensure      => $ensure,
-      check_code  => $check_code,
-      ssl_mode    => $ssl_mode,
+      ensure     => $ensure,
+      check_code => 'OK',
+      ssl_mode   => $ssl_mode,
     }
   }
 }

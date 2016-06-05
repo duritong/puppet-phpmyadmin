@@ -1,0 +1,16 @@
+<?php
+$cfg['blowfish_secret'] = '<%= @blowfish_secret %>';
+<% @servers.each_with_index do |s,j|
+  # phpmyadmin config should start with one
+  i = j+1 -%>
+  // <%= i %> <%= s['host'] %>
+  $cfg['Servers'][<%= i %>]['host']            = '<%= s['host'] %>';
+  $cfg['Servers'][<%= i %>]['port']            = <%= s['port'] || 3306 %>;
+  $cfg['Servers'][<%= i %>]['auth_type']       = '<%= s['auth_type'] || 'cookie' %>';
+  $cfg['Servers'][<%= i %>]['connect_type']    = '<%= s['connect_type'] || 'tcp' %>';
+  $cfg['Servers'][<%= i %>]['compress']        = '<%= s['compress'] || false %>';
+  $cfg['Servers'][<%= i %>]['extension']       = '<%= s['extension'] || 'mysqli' %>';
+  $cfg['Servers'][<%= i %>]['AllowNoPassword'] = '<%= s['AllowNoPassword'] || false %>';
+
+<% end -%>
+?>
