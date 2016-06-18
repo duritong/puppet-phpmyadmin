@@ -20,7 +20,7 @@ class phpmyadmin(
     mode    => '0444',
   } -> file_line{'phpmyadmin_config_include':
     path  => '/etc/phpMyAdmin/config.inc.php',
-    line  => 'require(\'config.custom.php\');',
+    line  => 'require(\'/etc/phpMyAdmin/config.custom.php\');',
     after => '.*cfg\[\'PmaNoRelation_DisableWarning\'\] = .*',
   }
 }
