@@ -10,6 +10,7 @@ define phpmyadmin::vhost(
   $auth_method    = 'cookie',
   $logmode        = 'default',
   $manage_nagios  = false,
+  $configuration  = {},
 ){
   $documentroot = '/usr/share/phpMyAdmin'
 
@@ -75,6 +76,7 @@ define phpmyadmin::vhost(
     manage_webdir      => false,
     path_is_webdir     => true,
     ssl_mode           => $ssl_mode,
+    configuration      => $configuration,
     mod_security       => false,
     require            => Package['phpMyAdmin'],
     additional_options => '<Directory /usr/share/phpMyAdmin/>
