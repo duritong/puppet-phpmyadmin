@@ -14,7 +14,10 @@ define phpmyadmin::vhost(
 ){
   $documentroot = '/usr/share/phpMyAdmin'
 
-  include ::phpmyadmin
+  class{'::phpmyadmin':
+    upload_dir => "/var/www/upload_tmp_dir/${name}/upload",
+    save_dir   => "/var/www/upload_tmp_dir/${name}/save",
+  }
   include ::phpmyadmin::vhost::absent_webconfig
 
 
@@ -48,12 +51,7 @@ define phpmyadmin::vhost(
   }
 
   if versioncmp($::operatingsystemmajrelease,'6') > 0 {
-    if $::phpmyadmin_version {
-      $guessed_phpmyadmin_version = $::phpmyadmin_version
-    } else {
-      $guessed_phpmyadmin_version = '4.4.15.5'
-    }
-    $open_basedir = "${documentroot}/:/usr/share/doc/phpMyAdmin-${guessed_phpmyadmin_version}/html/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
+    $open_basedir = "${documentroot}/:/usr/share/doc/phpMyAdmin-${phpmyadmin::guessed_version}/html/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
   } else {
     $open_basedir = "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
   }
@@ -142,6 +140,16 @@ define phpmyadmin::vhost(
       ensure     => $ensure,
       check_code => 'OK',
       ssl_mode   => $ssl_mode,
+    }
+  }
+
+  if $ensure == 'present' {
+    file{[$phpmyadmin::upload_dir,$phpmyadmin::save_dir]:
+      ensure => directory,
+      owner  => $name,
+      group  => $name,
+      mode   => '0770',
+      before => Service['apache'],
     }
   }
 }

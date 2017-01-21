@@ -1,14 +1,21 @@
 # manage the basis of a phppgadmin
 class phpmyadmin(
   $blowfish_secret = trocla("phpmyadmin_blowfish_secret_${::fqdn}",'plain','length: 32'),
-  $servers = [
+  $servers         = [
     { 'host' => 'localhost' },
   ],
+  $upload_dir      = '/var/lib/phpMyAdmin/upload',
+  $save_dir        = '/var/lib/phpMyAdmin/save',
 ) {
   include ::php
   include ::php::extensions::mysql
   include ::php::extensions::mcrypt
 
+  if $::phpmyadmin_version {
+    $guessed_version = $::phpmyadmin_version
+  } else {
+    $guessed_version = '4.4.15.9'
+  }
 
   package{'phpMyAdmin':
     ensure  => installed,
@@ -22,5 +29,8 @@ class phpmyadmin(
     path  => '/etc/phpMyAdmin/config.inc.php',
     line  => 'require(\'/etc/phpMyAdmin/config.custom.php\');',
     after => '.*cfg\[\'PmaNoRelation_DisableWarning\'\] = .*',
+  } -> file{'/usr/share/phpMyAdmin/doc/html': # fix broken rpm
+    ensure => link,
+    target => "/usr/share/doc/phpMyAdmin-${guessed_version}/html",
   }
 }

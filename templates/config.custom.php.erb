@@ -1,5 +1,7 @@
 <?php
 $cfg['blowfish_secret'] = '<%= @blowfish_secret %>';
+$cfg['UploadDir'] = '<%= @upload_dir %>';
+$cfg['SaveDir'] = '<%= @save_dir %>';
 <% @servers.each_with_index do |s,j|
   # phpmyadmin config should start with one
   i = j+1 -%>
