@@ -56,16 +56,18 @@ define phpmyadmin::vhost(
     $open_basedir = "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
   }
   apache::vhost::php::standard{$name:
-    ensure           => $ensure,
-    domainalias      => $domainalias,
-    manage_docroot   => false,
-    path             => $documentroot,
-    logpath          => '/var/log/httpd',
-    logprefix        => "${name}-",
-    php_settings     => {
-      'session.save_path' => "/var/www/session.save_path/${name}/",
-      'upload_tmp_dir'    => "/var/www/upload_tmp_dir/${name}/",
-      'open_basedir'      => $open_basedir,
+    ensure             => $ensure,
+    domainalias        => $domainalias,
+    manage_docroot     => false,
+    path               => $documentroot,
+    logpath            => '/var/log/httpd',
+    logprefix          => "${name}-",
+    php_settings       => {
+      'upload_max_filesize' => '80M',
+      'post_max_size'       => '90M',
+      'session.save_path'   => "/var/www/session.save_path/${name}/",
+      'upload_tmp_dir'      => "/var/www/upload_tmp_dir/${name}/",
+      'open_basedir'        => $open_basedir,
     },
     logmode            => $logmode,
     run_mode           => $run_mode,
