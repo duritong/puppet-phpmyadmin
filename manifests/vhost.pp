@@ -81,10 +81,6 @@ define phpmyadmin::vhost(
     require            => Package['phpMyAdmin'],
     additional_options => '<Directory /usr/share/phpMyAdmin/>
     AddDefaultCharset UTF-8
-    <IfModule mod_fcgid.c>
-      FcgidMaxRequestLen 99614720
-      FcgidIOTimeout 1200
-    </IfModule>
     <IfModule mod_authz_core.c>
       # Apache 2.4
       <RequireAny>
@@ -113,6 +109,10 @@ define phpmyadmin::vhost(
       Allow from ::1
     </IfModule>
   </Directory>
+  <IfModule mod_fcgid.c>
+    FcgidMaxRequestLen 99614720
+    FcgidIOTimeout 1200
+  </IfModule>
 
   # These directories do not require access over HTTP - taken from the original
   # phpMyAdmin upstream tarball
