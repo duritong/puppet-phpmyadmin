@@ -81,6 +81,10 @@ define phpmyadmin::vhost(
     require            => Package['phpMyAdmin'],
     additional_options => '<Directory /usr/share/phpMyAdmin/>
     AddDefaultCharset UTF-8
+    <IfModule mod_fcgid.c>
+      FcgidMaxRequestLen 99614720
+      FcgidIOTimeout 1200
+    </IfModule>
     <IfModule mod_authz_core.c>
       # Apache 2.4
       <RequireAny>
