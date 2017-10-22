@@ -50,24 +50,22 @@ define phpmyadmin::vhost(
       mode    => '0640';
   }
 
-  if versioncmp($::operatingsystemmajrelease,'6') > 0 {
-    $open_basedir = "${documentroot}/:/usr/share/doc/phpMyAdmin-${phpmyadmin::guessed_version}/html/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
-  } else {
-    $open_basedir = "${documentroot}/:/usr/share/php:/etc/phpMyAdmin/:/var/www/upload_tmp_dir/${name}/:/var/www/session.save_path/${name}/"
-  }
+  $additional_open_basedir = "/usr/share/doc/phpMyAdmin-${phpmyadmin::guessed_version}/html/:/etc/phpMyAdmin/"
   apache::vhost::php::standard{$name:
-    ensure             => $ensure,
-    domainalias        => $domainalias,
-    manage_docroot     => false,
-    path               => $documentroot,
-    logpath            => '/var/log/httpd',
-    logprefix          => "${name}-",
-    php_settings       => {
+    ensure            => $ensure,
+    domainalias       => $domainalias,
+    manage_docroot    => false,
+    path              => $documentroot,
+    logpath           => '/var/log/httpd',
+    logprefix         => "${name}-",
+    php_options       => {
+      additional_open_basedir => $additional_open_basedir,
+    },
+    php_settings            => {
       'upload_max_filesize' => '80M',
       'post_max_size'       => '90M',
       'session.save_path'   => "/var/www/session.save_path/${name}/",
       'upload_tmp_dir'      => "/var/www/upload_tmp_dir/${name}/",
-      'open_basedir'        => $open_basedir,
     },
     logmode            => $logmode,
     run_mode           => $run_mode,
