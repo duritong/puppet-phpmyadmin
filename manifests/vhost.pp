@@ -15,8 +15,8 @@ define phpmyadmin::vhost(
   $documentroot = '/usr/share/phpMyAdmin'
 
   class{'::phpmyadmin':
-    upload_dir => "/var/www/upload_tmp_dir/${name}/upload",
-    save_dir   => "/var/www/upload_tmp_dir/${name}/save",
+    upload_dir => "/var/www/php_tmp/${name}/tmp/upload",
+    save_dir   => "/var/www/php_tmp/${name}/tmp/save",
   }
   include ::phpmyadmin::vhost::absent_webconfig
 
@@ -64,8 +64,8 @@ define phpmyadmin::vhost(
     php_settings            => {
       'upload_max_filesize' => '80M',
       'post_max_size'       => '90M',
-      'session.save_path'   => "/var/www/session.save_path/${name}/",
-      'upload_tmp_dir'      => "/var/www/upload_tmp_dir/${name}/",
+      'session.save_path'   => "/var/www/php_tmp/${name}/sessions",
+      'upload_tmp_dir'      => "/var/www/php_tmp/${name}/uploads",
     },
     logmode            => $logmode,
     run_mode           => $run_mode,
