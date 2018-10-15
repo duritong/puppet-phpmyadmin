@@ -21,7 +21,7 @@ define phpmyadmin::vhost(
   include ::phpmyadmin::vhost::absent_webconfig
 
 
-  if ($run_mode == 'fcgid'){
+  if ($run_mode in ['fcgid','fpm']){
     if (($run_uid == 'absent') or ($run_gid == 'absent')) {
       fail("Need to configure \$run_uid and \$run_gid if you want to run Phpmyadmin::Vhost[${name}] as fcgid.")
     }
@@ -34,6 +34,18 @@ define phpmyadmin::vhost(
       homedir    => $documentroot,
       shell      => '/sbin/nologin',
       before     => Apache::Vhost::Php::Standard[$name],
+    }
+    user::groups::manage_user{
+      "apache_in_${name}":
+        ensure => $ensure,
+        group  => $name,
+        user   => 'apache',
+        notify => Service['apache'],
+    }
+    if $ensure == 'present' {
+      User::Groups::Manage_user["apache_in_${name}"]{
+        require => User::Managed[$name],
+      }
     }
   }
 
@@ -149,11 +161,12 @@ define phpmyadmin::vhost(
 
   if $ensure == 'present' {
     file{[$phpmyadmin::upload_dir,$phpmyadmin::save_dir]:
-      ensure => directory,
-      owner  => $name,
-      group  => $name,
-      mode   => '0770',
-      before => Service['apache'],
+      ensure  => directory,
+      owner   => $name,
+      group   => $name,
+      mode    => '0770',
+      seltype => 'httpd_sys_rw_content_t',
+      before  => Service['apache'],
     }
   }
 }
