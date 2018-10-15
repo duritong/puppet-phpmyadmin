@@ -11,10 +11,10 @@ class phpmyadmin(
   include ::php::extensions::mysql
   include ::php::extensions::mcrypt
 
-  if $::phpmyadmin_version {
-    $guessed_version = $::phpmyadmin_version
+  if $facts['phpmyadmin_version'] {
+    $guessed_version = $facts['phpmyadmin_version']
   } else {
-    $guessed_version = '4.4.15.9'
+    $guessed_version = '4.4.15.10'
   }
 
   package{'phpMyAdmin':
