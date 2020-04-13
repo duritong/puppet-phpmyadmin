@@ -154,7 +154,7 @@ define phpmyadmin::vhost(
     }
     nagios::service::http{$real_monitor_url:
       ensure     => $ensure,
-      check_code => 'OK',
+      check_code => '200',
       ssl_mode   => $ssl_mode,
     }
   }
