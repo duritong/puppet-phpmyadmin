@@ -14,11 +14,11 @@ define phpmyadmin::vhost(
 ){
   $documentroot = '/usr/share/phpMyAdmin'
 
-  class{'::phpmyadmin':
+  class{'phpmyadmin':
     upload_dir => "/var/www/php_tmp/${name}/tmp/upload",
     save_dir   => "/var/www/php_tmp/${name}/tmp/save",
   }
-  include ::phpmyadmin::vhost::absent_webconfig
+  include phpmyadmin::vhost::absent_webconfig
 
 
   if ($run_mode in ['fcgid','fpm']){
@@ -57,23 +57,23 @@ define phpmyadmin::vhost(
       mode    => '0640',
       require => Package['phpMyAdmin'];
     '/etc/phpMyAdmin/config.inc.php':
-      owner   => root,
-      group   => $name,
-      mode    => '0640';
+      owner => root,
+      group => $name,
+      mode  => '0640';
   }
 
   $additional_open_basedir = "/usr/share/doc/phpMyAdmin-${phpmyadmin::guessed_version}/html/:/etc/phpMyAdmin/"
   apache::vhost::php::standard{$name:
-    ensure            => $ensure,
-    domainalias       => $domainalias,
-    manage_docroot    => false,
-    path              => $documentroot,
-    logpath           => '/var/log/httpd',
-    logprefix         => "${name}-",
-    php_options       => {
+    ensure             => $ensure,
+    domainalias        => $domainalias,
+    manage_docroot     => false,
+    path               => $documentroot,
+    logpath            => '/var/log/httpd',
+    logprefix          => "${name}-",
+    php_options        => {
       additional_open_basedir => $additional_open_basedir,
     },
-    php_settings            => {
+    php_settings       => {
       'upload_max_filesize' => '80M',
       'post_max_size'       => '90M',
       'session.save_path'   => "/var/www/php_tmp/${name}/sessions",
@@ -149,8 +149,8 @@ define phpmyadmin::vhost(
 
   if $manage_nagios {
     $real_monitor_url = $monitor_url ? {
-      'absent'  => $name,
-      default   => $monitor_url,
+      'absent' => $name,
+      default  => $monitor_url,
     }
     nagios::service::http{$real_monitor_url:
       ensure     => $ensure,
