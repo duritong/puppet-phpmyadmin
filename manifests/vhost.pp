@@ -1,5 +1,5 @@
 # install a phpmyadmin vhost
-define phpmyadmin::vhost(
+define phpmyadmin::vhost (
   $ensure         = 'present',
   $domainalias    = 'absent',
   $ssl_mode       = 'force',
@@ -11,22 +11,21 @@ define phpmyadmin::vhost(
   $logmode        = 'default',
   $manage_nagios  = false,
   $configuration  = {},
-){
+) {
   $documentroot = '/usr/share/phpMyAdmin'
 
-  class{'phpmyadmin':
+  class { 'phpmyadmin':
     upload_dir => "/var/www/php_tmp/${name}/tmp/upload",
     save_dir   => "/var/www/php_tmp/${name}/tmp/save",
   }
   include phpmyadmin::vhost::absent_webconfig
 
-
-  if ($run_mode in ['fcgid','fpm']){
+  if ($run_mode in ['fcgid','fpm']) {
     if (($run_uid == 'absent') or ($run_gid == 'absent')) {
       fail("Need to configure \$run_uid and \$run_gid if you want to run Phpmyadmin::Vhost[${name}] as fcgid.")
     }
 
-    user::managed{$name:
+    user::managed { $name:
       ensure     => $ensure,
       uid        => $run_uid,
       gid        => $run_gid,
@@ -35,7 +34,7 @@ define phpmyadmin::vhost(
       shell      => '/sbin/nologin',
       before     => Apache::Vhost::Php::Standard[$name],
     }
-    user::groups::manage_user{
+    user::groups::manage_user {
       "apache_in_${name}":
         ensure => $ensure,
         group  => $name,
@@ -43,13 +42,13 @@ define phpmyadmin::vhost(
         notify => Service['apache'],
     }
     if $ensure == 'present' {
-      User::Groups::Manage_user["apache_in_${name}"]{
+      User::Groups::Manage_user["apache_in_${name}"] {
         require => User::Managed[$name],
       }
     }
   }
 
-  file{
+  file {
     '/etc/phpMyAdmin':
       ensure  => directory,
       owner   => root,
@@ -63,7 +62,7 @@ define phpmyadmin::vhost(
   }
 
   $additional_open_basedir = "/usr/share/doc/phpMyAdmin-${phpmyadmin::guessed_version}/html/:/etc/phpMyAdmin/"
-  apache::vhost::php::standard{$name:
+  apache::vhost::php::standard { $name:
     ensure             => $ensure,
     domainalias        => $domainalias,
     manage_docroot     => false,
@@ -152,7 +151,7 @@ define phpmyadmin::vhost(
       'absent' => $name,
       default  => $monitor_url,
     }
-    nagios::service::http{$real_monitor_url:
+    nagios::service::http { $real_monitor_url:
       ensure     => $ensure,
       check_code => '200',
       ssl_mode   => $ssl_mode,
@@ -160,7 +159,7 @@ define phpmyadmin::vhost(
   }
 
   if $ensure == 'present' {
-    file{[$phpmyadmin::upload_dir,$phpmyadmin::save_dir]:
+    file { [$phpmyadmin::upload_dir,$phpmyadmin::save_dir]:
       ensure  => directory,
       owner   => $name,
       group   => $name,
