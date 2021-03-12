@@ -78,6 +78,7 @@ define phpmyadmin::vhost (
       'session.save_path'   => "/var/www/php_tmp/${name}/sessions",
       'upload_tmp_dir'      => "/var/www/php_tmp/${name}/uploads",
     },
+    php_installation   => 'system',
     logmode            => $logmode,
     run_mode           => $run_mode,
     run_uid            => $name,
